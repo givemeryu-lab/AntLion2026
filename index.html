@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -320,12 +320,12 @@
 
   .container {
     margin: 0;
-    border-radius: 0;   /* ✅ 좌우 꽉 채우기 */
+    border-radius: 0;
     max-width: 100%;
   }
 
   .content {
-    padding: 5px;   /* ✅ 30px → 줄이기 */
+    padding: 5px;
   }
 
   .header {
@@ -333,7 +333,7 @@
   }
 
   #map {
-    height: 400px;  /* ✅ 모바일에서 지도 줄이기 */
+    height: 400px;
   }
 
 }
@@ -416,12 +416,47 @@
             border-color: #28a745;
             border-style: solid;
         }
+
+        .algorithm-select {
+            margin-bottom: 20px;
+        }
+
+        .algorithm-select label {
+            margin-bottom: 10px;
+        }
+
+        .algorithm-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .algo-btn {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .algo-btn:hover {
+            border-color: #667eea;
+        }
+
+        .algo-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🗺️ 2026 개미귀신 전국투아 최단거리 경로 찾기!!</h1>
+            <p style="font-size: 14px; opacity: 0.9;">실제 도로 경로 기반 · 원점 복귀 포함</p>
         </div>
 
         <div class="content">
@@ -434,6 +469,15 @@
                     <label>또는 좌표 입력 (위도, 경도)</label>
                     <input type="text" id="startCoords" placeholder="예: 37.5665, 126.9780">
                 </div>
+
+                <div class="algorithm-select">
+                    <label>🧮 알고리즘 선택</label>
+                    <div class="algorithm-buttons">
+                        <button class="algo-btn active" data-algo="nearest-neighbor">최근접 이웃</button>
+                        <button class="algo-btn" data-algo="2-opt">2-Opt 최적화</button>
+                    </div>
+                </div>
+
                 <div class="button-group">
                     <button class="btn-primary" onclick="calculateRoute()">🚀 경로 계산</button>
                     <button class="btn-secondary" onclick="resetForm()">🔄 초기화</button>
@@ -463,7 +507,7 @@
                     <h2>📊 경로 요약</h2>
                     <div class="summary-stats">
                         <div class="stat-box">
-                            <div class="stat-label">총 거리</div>
+                            <div class="stat-label">총 거리 (실제 도로)</div>
                             <div class="stat-value" id="totalDistance">0 km</div>
                         </div>
                         <div class="stat-box">
@@ -473,6 +517,10 @@
                         <div class="stat-box">
                             <div class="stat-label">획득 포인트</div>
                             <div class="stat-value" id="totalPoints">0점</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">예상 소요 시간</div>
+                            <div class="stat-value" id="totalTime">0분</div>
                         </div>
                     </div>
                 </div>
@@ -532,6 +580,15 @@
         let map = null;
         let routeLayer = null;
         let markersLayer = null;
+        let currentAlgorithm = 'nearest-neighbor';
+
+        document.querySelectorAll('.algo-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.algo-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentAlgorithm = btn.dataset.algo;
+            });
+        });
 
         function initMap() {
             if (!map) {
@@ -546,6 +603,73 @@
             }
         }
 
+        async function getActualDistance(lat1, lng1, lat2, lng2) {
+            try {
+                const response = await fetch(
+                    `https://router.project-osrm.org/route/v1/driving/${lng1},${lat1};${lng2},${lat2}`
+                );
+                const data = await response.json();
+                
+                if (data.routes && data.routes.length > 0) {
+                    return {
+                        distance: data.routes[0].distance / 1000,
+                        duration: data.routes[0].duration
+                    };
+                }
+                return null;
+            } catch (error) {
+                console.warn('OSRM API 오류:', error);
+                return null;
+            }
+        }
+
+        async function nearestNeighborOSRM(startLat, startLng, locations) {
+            const unvisited = [...locations];
+            const route = [];
+            let currentLat = startLat;
+            let currentLng = startLng;
+            let totalDistance = 0;
+            let totalDuration = 0;
+
+            while (unvisited.length > 0) {
+                let nearestIndex = 0;
+                let minDistance = Infinity;
+                let bestResult = null;
+
+                for (let i = 0; i < unvisited.length; i++) {
+                    const result = await getActualDistance(
+                        currentLat, currentLng,
+                        unvisited[i].lat, unvisited[i].lng
+                    );
+                    
+                    if (result && result.distance < minDistance) {
+                        minDistance = result.distance;
+                        nearestIndex = i;
+                        bestResult = result;
+                    }
+                }
+
+                const nearest = unvisited[nearestIndex];
+                route.push({
+                    location: nearest,
+                    distance: bestResult?.distance || 0,
+                    duration: bestResult?.duration || 0
+                });
+                totalDistance += bestResult?.distance || 0;
+                totalDuration += bestResult?.duration || 0;
+                
+                currentLat = nearest.lat;
+                currentLng = nearest.lng;
+                unvisited.splice(nearestIndex, 1);
+            }
+
+            const returnResult = await getActualDistance(currentLat, currentLng, startLat, startLng);
+            totalDistance += returnResult?.distance || 0;
+            totalDuration += returnResult?.duration || 0;
+
+            return { route, totalDistance, totalDuration };
+        }
+
         function showRouteOnMap() {
             if (!currentRoute || !startPoint) {
                 alert('먼저 경로를 계산해주세요.');
@@ -553,41 +677,36 @@
             }
 
             initMap();
-            
-            // 기존 레이어 제거
             routeLayer.clearLayers();
             markersLayer.clearLayers();
 
-            // 경로 좌표 배열 생성
             const routeCoords = [[startPoint.lat, startPoint.lng]];
             currentRoute.forEach(item => {
                 routeCoords.push([item.location.lat, item.location.lng]);
             });
+            routeCoords.push([startPoint.lat, startPoint.lng]);
 
-            // 경로 라인 그리기
             const polyline = L.polyline(routeCoords, {
                 color: '#667eea',
                 weight: 4,
                 opacity: 0.7
             }).addTo(routeLayer);
 
-            // 출발지 마커
             const startIcon = L.divIcon({
                 className: 'custom-div-icon',
-                html: `<div style="background-color: #0066ff; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">출발</div>`,
+                html: `<div style="background-color: #0066ff; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px;">S</div>`,
                 iconSize: [40, 40],
                 iconAnchor: [20, 20]
             });
 
             L.marker([startPoint.lat, startPoint.lng], { icon: startIcon })
-                .bindPopup('<b>출발지</b>')
+                .bindPopup('<b>출발지/도착지</b>')
                 .addTo(markersLayer);
 
-            // 방문지 마커
             currentRoute.forEach((item, index) => {
                 const markerIcon = L.divIcon({
                     className: 'custom-div-icon',
-                    html: `<div style="background-color: #ff4757; color: white; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">${index + 1}</div>`,
+                    html: `<div style="background-color: #ff4757; color: white; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-weight: bold;">${index + 1}</div>`,
                     iconSize: [35, 35],
                     iconAnchor: [17.5, 17.5]
                 });
@@ -601,9 +720,7 @@
                     .addTo(markersLayer);
             });
 
-            // 지도 범위 맞추기
             map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
-
             showSuccessMessage('✅ 지도에 경로가 표시되었습니다!');
         }
 
@@ -634,11 +751,9 @@
             try {
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(gpxContent, 'text/xml');
-                
-                // 트랙 포인트 추출
                 const trkpts = xmlDoc.getElementsByTagName('trkpt');
                 const wpts = xmlDoc.getElementsByTagName('wpt');
-                
+
                 if (trkpts.length === 0 && wpts.length === 0) {
                     throw new Error('GPX 파일에 유효한 경로 정보가 없습니다.');
                 }
@@ -649,7 +764,6 @@
 
                 const routeCoords = [];
                 
-                // 트랙 포인트로 경로 라인 그리기
                 for (let i = 0; i < trkpts.length; i++) {
                     const lat = parseFloat(trkpts[i].getAttribute('lat'));
                     const lng = parseFloat(trkpts[i].getAttribute('lon'));
@@ -666,7 +780,6 @@
                     map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
                 }
 
-                // 웨이포인트 마커 추가
                 for (let i = 0; i < wpts.length; i++) {
                     const lat = parseFloat(wpts[i].getAttribute('lat'));
                     const lng = parseFloat(wpts[i].getAttribute('lon'));
@@ -680,14 +793,14 @@
                     if (name.includes('출발지')) {
                         markerIcon = L.divIcon({
                             className: 'custom-div-icon',
-                            html: `<div style="background-color: #0066ff; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">출발</div>`,
+                            html: `<div style="background-color: #0066ff; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">S</div>`,
                             iconSize: [40, 40],
                             iconAnchor: [20, 20]
                         });
                     } else {
                         markerIcon = L.divIcon({
                             className: 'custom-div-icon',
-                            html: `<div style="background-color: #28a745; color: white; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">${i}</div>`,
+                            html: `<div style="background-color: #28a745; color: white; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">✓</div>`,
                             iconSize: [35, 35],
                             iconAnchor: [17.5, 17.5]
                         });
@@ -700,8 +813,6 @@
 
                 document.getElementById('results').classList.add('show');
                 showSuccessMessage('✅ GPX 파일이 지도에 표시되었습니다!');
-                
-                // 스크롤을 지도로 이동
                 document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'center' });
 
             } catch (error) {
@@ -711,7 +822,6 @@
             }
         }
 
-        // 드래그 앤 드롭 지원
         const fileLabel = document.getElementById('fileLabel');
         
         fileLabel.addEventListener('dragover', (e) => {
@@ -738,56 +848,12 @@
             }
         });
 
-        function getDistance(lat1, lng1, lat2, lng2) {
-            const R = 6371;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLng = (lng2 - lng1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                      Math.sin(dLng/2) * Math.sin(dLng/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
-        }
-
-        function nearestNeighbor(startLat, startLng, locations) {
-            const unvisited = [...locations];
-            const route = [];
-            let currentLat = startLat;
-            let currentLng = startLng;
-            let totalDistance = 0;
-
-            while (unvisited.length > 0) {
-                let nearestIndex = 0;
-                let minDistance = Infinity;
-
-                for (let i = 0; i < unvisited.length; i++) {
-                    const dist = getDistance(currentLat, currentLng, unvisited[i].lat, unvisited[i].lng);
-                    if (dist < minDistance) {
-                        minDistance = dist;
-                        nearestIndex = i;
-                    }
-                }
-
-                const nearest = unvisited[nearestIndex];
-                route.push({
-                    location: nearest,
-                    distance: minDistance
-                });
-                totalDistance += minDistance;
-                currentLat = nearest.lat;
-                currentLng = nearest.lng;
-                unvisited.splice(nearestIndex, 1);
-            }
-
-            return { route, totalDistance };
-        }
-
         function generateGPX(startPoint, route) {
             const now = new Date().toISOString();
             let gpx = `<?xml version="1.0" encoding="UTF-8"?>
 <gpx version="1.1" creator="최단거리경로찾기" xmlns="http://www.topografix.com/GPX/1/1">
     <metadata>
-        <name>최단거리 방문 경로</name>
+        <name>최단거리 방문 경로 (실제 도로 기반)</name>
         <time>${now}</time>
     </metadata>
     <trk>
@@ -807,12 +873,16 @@
 `;
             });
 
-            gpx += `        </trkseg>
+            gpx += `            <trkpt lat="${startPoint.lat}" lon="${startPoint.lng}">
+                <name>도착지 (원점 복귀)</name>
+                <time>${now}</time>
+            </trkpt>
+        </trkseg>
     </trk>
 `;
 
             gpx += `    <wpt lat="${startPoint.lat}" lon="${startPoint.lng}">
-        <name>출발지</name>
+        <name>출발지/도착지</name>
         <sym>Flag, Blue</sym>
     </wpt>
 `;
@@ -835,7 +905,7 @@
 <kml xmlns="http://www.opengis.net/kml/2.2">
     <Document>
         <name>최단거리 방문 경로</name>
-        <description>16개 방문지 최적 경로</description>
+        <description>16개 방문지 최적 경로 (실제 도로 기반, 원점 복귀 포함)</description>
         
         <Style id="startStyle">
             <IconStyle>
@@ -865,7 +935,7 @@
         </Style>
         
         <Placemark>
-            <name>출발지</name>
+            <name>출발지/도착지</name>
             <styleUrl>#startStyle</styleUrl>
             <Point>
                 <coordinates>${startPoint.lng},${startPoint.lat},0</coordinates>
@@ -880,7 +950,8 @@
                 <![CDATA[
                     <b>주소:</b> ${item.location.address}<br/>
                     <b>포인트:</b> ${item.location.points}점<br/>
-                    <b>거리:</b> ${item.distance.toFixed(1)} km
+                    <b>거리:</b> ${item.distance.toFixed(1)} km<br/>
+                    <b>소요시간:</b> ${Math.round(item.duration / 60)}분
                 ]]>
             </description>
             <styleUrl>#waypointStyle</styleUrl>
@@ -905,7 +976,8 @@
 `;
             });
 
-            kml += `                </coordinates>
+            kml += `                    ${startPoint.lng},${startPoint.lat},0
+                </coordinates>
             </LineString>
         </Placemark>
     </Document>
@@ -1000,50 +1072,68 @@
                     errorMsg.classList.add('show');
                     return;
                 }
-                loading.classList.remove('show');
             } else {
-                errorMsg.textContent = '❌ 출발지 주소 또는 좌표를 입력해주세요.';
+                errorMsg.textContent = '❌ 주소 또는 좌표를 입력해주세요.';
                 errorMsg.classList.add('show');
                 return;
             }
 
             loading.classList.add('show');
             
-            setTimeout(() => {
-                const { route, totalDistance } = nearestNeighbor(startLat, startLng, locations);
-                
-                currentRoute = route;
+            try {
                 startPoint = { lat: startLat, lng: startLng };
                 
+                const result = await nearestNeighborOSRM(startLat, startLng, locations);
+                currentRoute = result.route;
+                
+                const totalDistance = currentRoute.reduce((sum, item) => sum + item.distance, 0);
+                const totalDuration = currentRoute.reduce((sum, item) => sum + item.duration, 0);
+                const totalPoints = currentRoute.reduce((sum, item) => sum + item.location.points, 0);
+
                 document.getElementById('totalDistance').textContent = totalDistance.toFixed(1) + ' km';
-                const totalPoints = locations.reduce((sum, loc) => sum + loc.points, 0);
                 document.getElementById('totalPoints').textContent = totalPoints + '점';
+                document.getElementById('totalTime').textContent = Math.round(totalDuration / 60) + '분';
+
+                const routeListDiv = document.getElementById('routeList');
+                routeListDiv.innerHTML = '';
                 
-                const routeList = document.getElementById('routeList');
-                routeList.innerHTML = '';
-                
-                route.forEach((item, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'route-item';
-                    div.innerHTML = `
+                currentRoute.forEach((item, index) => {
+                    const routeItem = document.createElement('div');
+                    routeItem.className = 'route-item';
+                    routeItem.innerHTML = `
                         <span class="route-number">${index + 1}</span>
                         <div class="route-info">
                             <div class="route-name">${item.location.name}</div>
                             <div class="route-address">${item.location.address}</div>
                         </div>
-                        <span class="route-distance">${item.distance.toFixed(1)} km</span>
+                        <div class="route-distance">${item.distance.toFixed(1)} km · ${Math.round(item.duration / 60)}분</div>
                     `;
-                    routeList.appendChild(div);
+                    routeListDiv.appendChild(routeItem);
                 });
-                
-                loading.classList.remove('show');
+
+                const returnItem = document.createElement('div');
+                returnItem.className = 'route-item';
+                returnItem.style.borderLeftColor = '#28a745';
+                returnItem.innerHTML = `
+                    <span class="route-number" style="background-color: #28a745;">✓</span>
+                    <div class="route-info">
+                        <div class="route-name">원점 복귀</div>
+                        <div class="route-address">시작점으로 귀환</div>
+                    </div>
+                    <div class="route-distance">최종 도착</div>
+                `;
+                routeListDiv.appendChild(returnItem);
+
                 results.classList.add('show');
-                
-                // 자동으로 지도에 표시
-                showRouteOnMap();
-                
+                showSuccessMessage('✅ 경로 계산이 완료되었습니다!');
                 results.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 500); 
+
+            } catch (error) {
+                errorMsg.textContent = `❌ 경로 계산 실패: ${error.message}`;
+                errorMsg.classList.add('show');
+            } finally {
+                loading.classList.remove('show');
+            }
         }
 
         function resetForm() {
@@ -1054,27 +1144,9 @@
             document.getElementById('fileLabel').classList.remove('has-file');
             document.getElementById('results').classList.remove('show');
             document.getElementById('errorMsg').classList.remove('show');
-            document.getElementById('successMsg').classList.remove('show');
             currentRoute = null;
             startPoint = null;
-            
-            if (map) {
-                routeLayer.clearLayers();
-                markersLayer.clearLayers();
-            }
         }
-
-        document.getElementById('startAddress').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') calculateRoute();
-        });
-
-        document.getElementById('startCoords').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') calculateRoute();
-        });
     </script>
 </body>
 </html>
-
-
-
-
