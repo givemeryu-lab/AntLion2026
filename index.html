@@ -1,0 +1,1053 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 전국투아</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .summary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .summary h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        .map-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .map-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        #map {
+            width: 100%;
+            height: 600px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .map-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .export-section {
+            background: #e7f3ff;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .export-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .export-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .route-list {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+        }
+
+        .route-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .route-item:hover {
+            transform: translateX(5px);
+        }
+
+        .route-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 35px;
+            height: 35px;
+            line-height: 35px;
+            text-align: center;
+            border-radius: 50%;
+            font-weight: 700;
+            margin-right: 15px;
+        }
+
+        .route-info {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .route-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .route-address {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .route-distance {
+            float: right;
+            background: #e7f3ff;
+            color: #0066cc;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .success-message {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .file-upload-section {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .file-upload-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 15px;
+            background: white;
+            border: 2px dashed #ffc107;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-input-label:hover {
+            background: #fffbf0;
+            border-color: #e0a800;
+        }
+
+        .file-input-label.has-file {
+            background: #d4edda;
+            border-color: #28a745;
+            border-style: solid;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗺️ 2026 개미귀신 전국투아 최단거리 경로 찾기</h1>
+            <p>시작점 만알려주시면 16개 방문지를 최단거리로 안내해 드립니다</p>
+			<p>포인트별 직선거리만 고려 했습니다, 실제길은 다를 수 있습니다</p>
+        </div>
+
+        <div class="content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label>📍 출발지 주소</label>
+                    <input type="text" id="startAddress" placeholder="예: 서울특별시 강남구 테헤란로 152">
+                </div>
+                <div class="input-group">
+                    <label>또는 좌표 입력 (위도, 경도)</label>
+                    <input type="text" id="startCoords" placeholder="예: 37.5665, 126.9780">
+                </div>
+                <div class="button-group">
+                    <button class="btn-primary" onclick="calculateRoute()">🚀 최단경로 계산</button>
+                    <button class="btn-secondary" onclick="resetForm()">🔄 초기화</button>
+                </div>
+            </div>
+
+            <div class="file-upload-section">
+                <h3>📂 GPX 파일 불러오기</h3>
+                <div class="file-input-wrapper">
+                    <input type="file" id="gpxFile" accept=".gpx" onchange="handleGPXUpload(event)">
+                    <label for="gpxFile" class="file-input-label" id="fileLabel">
+                        📁 GPX 파일을 선택하거나 드래그 앤 드롭하세요
+                    </label>
+                </div>
+            </div>
+
+            <div class="error" id="errorMsg"></div>
+            <div class="success-message" id="successMsg"></div>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>최적 경로를 계산중입니다...</p>
+            </div>
+
+            <div class="results" id="results">
+                <div class="summary">
+                    <h2>📊 경로 요약</h2>
+                    <div class="summary-stats">
+                        <div class="stat-box">
+                            <div class="stat-label">총 거리</div>
+                            <div class="stat-value" id="totalDistance">0 km</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">방문 지점</div>
+                            <div class="stat-value">16곳</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">획득 포인트</div>
+                            <div class="stat-value" id="totalPoints">0점</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="map-section">
+                    <h3>🗺️ 경로 지도</h3>
+                    <div class="map-controls">
+                        <button class="btn-warning" onclick="showRouteOnMap()">📍 지도에 경로 표시</button>
+                        <button class="btn-info" onclick="fitMapBounds()">🔍 전체 경로 보기</button>
+                    </div>
+                    <div id="map"></div>
+                </div>
+
+                <div class="export-section">
+                    <h3>📥 경로 파일 다운로드</h3>
+                    <div class="export-buttons">
+                        <button class="btn-success" onclick="downloadGPX()">
+                            📍 GPX 파일 다운로드
+                        </button>
+                        <button class="btn-info" onclick="downloadKML()">
+                            🗺️ KML 파일 다운로드
+                        </button>
+                    </div>
+                </div>
+
+                <div class="route-list">
+                    <h3 style="margin-bottom: 20px; color: #333;">🛣️ 방문 순서</h3>
+                    <div id="routeList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const locations = [
+            { id: 1, name: 'GPC (굿피플초이스)', address: '서울 양천구 중앙로 245 1층', lat: 37.5243, lng: 126.8555, points: 1 },
+            { id: 2, name: '록키아웃도아', address: '인천 중구 용유로 263-1', lat: 37.4430, lng: 126.3725, points: 2 },
+            { id: 3, name: '원진방앗간', address: '경기 화성시 향남읍 삼천병마로 188 1층', lat: 37.1297, lng: 126.9101, points: 1 },
+            { id: 4, name: '나마스테', address: '전북 완주군 운주면 대둔산로 2056', lat: 36.0006, lng: 127.2965, points: 1 },
+            { id: 5, name: '우리모두카페', address: '경북 능남길 3 1층', lat: 36.1320, lng: 128.2070, points: 1 },
+            { id: 6, name: 'RGB', address: '부산 영도구 와치로 35 3층', lat: 35.0915, lng: 129.0675, points: 1 },
+            { id: 7, name: 'R.O.D 커피', address: '전남 목포시 마인계터로26번길 21', lat: 34.8123, lng: 126.3922, points: 1 },
+            { id: 8, name: '예산반찬', address: '충남 예산군 역전로 84', lat: 36.6810, lng: 126.8440, points: 1 },
+            { id: 9, name: '모토브로 게라지카페', address: '충북 청주시 상당구 고은두산로 169 1층', lat: 36.6060, lng: 127.5240, points: 1 },
+            { id: 10, name: '캠프팔봉', address: '충북 충주시 대소원면 팔봉향산길 45-1', lat: 36.9835, lng: 127.9130, points: 2 },
+            { id: 11, name: '러브팩토리', address: '강원 정선군 광락로 519', lat: 37.3810, lng: 128.6630, points: 2 },
+            { id: 12, name: '개야리', address: '강원 홍천군 서면 개야리 99-3', lat: 37.6755, lng: 127.7220, points: 2 },
+            { id: 13, name: '적벽강', address: '충남 금산군 부리면 수통리 806', lat: 36.0690, lng: 127.5700, points: 2 },
+            { id: 14, name: '구례간전', address: '전남 구례군 간전면 간전중앙로 47', lat: 35.1970, lng: 127.4720, points: 2 },
+            { id: 15, name: '양항교', address: '경북 영천시 임고면 선원리 909-159', lat: 35.9730, lng: 128.9380, points: 2 },
+            { id: 16, name: '생림도요생태공원', address: '경남 김해시 생림면 도요리 5', lat: 35.2950, lng: 128.8480, points: 2 }
+        ];
+
+        let currentRoute = null;
+        let startPoint = null;
+        let map = null;
+        let routeLayer = null;
+        let markersLayer = null;
+
+        function initMap() {
+            if (!map) {
+                map = L.map('map').setView([36.5, 127.5], 7);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors',
+                    maxZoom: 18
+                }).addTo(map);
+                
+                routeLayer = L.layerGroup().addTo(map);
+                markersLayer = L.layerGroup().addTo(map);
+            }
+        }
+
+        function showRouteOnMap() {
+            if (!currentRoute || !startPoint) {
+                alert('먼저 경로를 계산해주세요.');
+                return;
+            }
+
+            initMap();
+            
+            // 기존 레이어 제거
+            routeLayer.clearLayers();
+            markersLayer.clearLayers();
+
+            // 경로 좌표 배열 생성
+            const routeCoords = [[startPoint.lat, startPoint.lng]];
+            currentRoute.forEach(item => {
+                routeCoords.push([item.location.lat, item.location.lng]);
+            });
+
+            // 경로 라인 그리기
+            const polyline = L.polyline(routeCoords, {
+                color: '#667eea',
+                weight: 4,
+                opacity: 0.7
+            }).addTo(routeLayer);
+
+            // 출발지 마커
+            const startIcon = L.divIcon({
+                className: 'custom-div-icon',
+                html: `<div style="background-color: #0066ff; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">출발</div>`,
+                iconSize: [40, 40],
+                iconAnchor: [20, 20]
+            });
+
+            L.marker([startPoint.lat, startPoint.lng], { icon: startIcon })
+                .bindPopup('<b>출발지</b>')
+                .addTo(markersLayer);
+
+            // 방문지 마커
+            currentRoute.forEach((item, index) => {
+                const markerIcon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `<div style="background-color: #ff4757; color: white; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">${index + 1}</div>`,
+                    iconSize: [35, 35],
+                    iconAnchor: [17.5, 17.5]
+                });
+
+                L.marker([item.location.lat, item.location.lng], { icon: markerIcon })
+                    .bindPopup(`
+                        <b>${index + 1}. ${item.location.name}</b><br>
+                        ${item.location.address}<br>
+                        <small>포인트: ${item.location.points}점 | 거리: ${item.distance.toFixed(1)} km</small>
+                    `)
+                    .addTo(markersLayer);
+            });
+
+            // 지도 범위 맞추기
+            map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
+
+            showSuccessMessage('✅ 지도에 경로가 표시되었습니다!');
+        }
+
+        function fitMapBounds() {
+            if (routeLayer && routeLayer.getLayers().length > 0) {
+                const bounds = routeLayer.getBounds();
+                map.fitBounds(bounds, { padding: [50, 50] });
+            }
+        }
+
+        function handleGPXUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const fileLabel = document.getElementById('fileLabel');
+            fileLabel.textContent = `📄 ${file.name}`;
+            fileLabel.classList.add('has-file');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const gpxContent = e.target.result;
+                parseAndDisplayGPX(gpxContent);
+            };
+            reader.readAsText(file);
+        }
+
+        function parseAndDisplayGPX(gpxContent) {
+            try {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(gpxContent, 'text/xml');
+                
+                // 트랙 포인트 추출
+                const trkpts = xmlDoc.getElementsByTagName('trkpt');
+                const wpts = xmlDoc.getElementsByTagName('wpt');
+                
+                if (trkpts.length === 0 && wpts.length === 0) {
+                    throw new Error('GPX 파일에 유효한 경로 정보가 없습니다.');
+                }
+
+                initMap();
+                routeLayer.clearLayers();
+                markersLayer.clearLayers();
+
+                const routeCoords = [];
+                
+                // 트랙 포인트로 경로 라인 그리기
+                for (let i = 0; i < trkpts.length; i++) {
+                    const lat = parseFloat(trkpts[i].getAttribute('lat'));
+                    const lng = parseFloat(trkpts[i].getAttribute('lon'));
+                    routeCoords.push([lat, lng]);
+                }
+
+                if (routeCoords.length > 0) {
+                    const polyline = L.polyline(routeCoords, {
+                        color: '#28a745',
+                        weight: 4,
+                        opacity: 0.7
+                    }).addTo(routeLayer);
+                    
+                    map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
+                }
+
+                // 웨이포인트 마커 추가
+                for (let i = 0; i < wpts.length; i++) {
+                    const lat = parseFloat(wpts[i].getAttribute('lat'));
+                    const lng = parseFloat(wpts[i].getAttribute('lon'));
+                    const nameEl = wpts[i].getElementsByTagName('name')[0];
+                    const descEl = wpts[i].getElementsByTagName('desc')[0];
+                    
+                    const name = nameEl ? nameEl.textContent : `Point ${i + 1}`;
+                    const desc = descEl ? descEl.textContent : '';
+
+                    let markerIcon;
+                    if (name.includes('출발지')) {
+                        markerIcon = L.divIcon({
+                            className: 'custom-div-icon',
+                            html: `<div style="background-color: #0066ff; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">출발</div>`,
+                            iconSize: [40, 40],
+                            iconAnchor: [20, 20]
+                        });
+                    } else {
+                        markerIcon = L.divIcon({
+                            className: 'custom-div-icon',
+                            html: `<div style="background-color: #28a745; color: white; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">${i}</div>`,
+                            iconSize: [35, 35],
+                            iconAnchor: [17.5, 17.5]
+                        });
+                    }
+
+                    L.marker([lat, lng], { icon: markerIcon })
+                        .bindPopup(`<b>${name}</b><br>${desc}`)
+                        .addTo(markersLayer);
+                }
+
+                document.getElementById('results').classList.add('show');
+                showSuccessMessage('✅ GPX 파일이 지도에 표시되었습니다!');
+                
+                // 스크롤을 지도로 이동
+                document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            } catch (error) {
+                const errorMsg = document.getElementById('errorMsg');
+                errorMsg.textContent = `❌ GPX 파일 파싱 실패: ${error.message}`;
+                errorMsg.classList.add('show');
+            }
+        }
+
+        // 드래그 앤 드롭 지원
+        const fileLabel = document.getElementById('fileLabel');
+        
+        fileLabel.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileLabel.style.borderColor = '#667eea';
+            fileLabel.style.background = '#f0f4ff';
+        });
+
+        fileLabel.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            fileLabel.style.borderColor = '#ffc107';
+            fileLabel.style.background = 'white';
+        });
+
+        fileLabel.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileLabel.style.borderColor = '#ffc107';
+            fileLabel.style.background = 'white';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('gpxFile').files = files;
+                handleGPXUpload({ target: { files: files } });
+            }
+        });
+
+        function getDistance(lat1, lng1, lat2, lng2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLng/2) * Math.sin(dLng/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        function nearestNeighbor(startLat, startLng, locations) {
+            const unvisited = [...locations];
+            const route = [];
+            let currentLat = startLat;
+            let currentLng = startLng;
+            let totalDistance = 0;
+
+            while (unvisited.length > 0) {
+                let nearestIndex = 0;
+                let minDistance = Infinity;
+
+                for (let i = 0; i < unvisited.length; i++) {
+                    const dist = getDistance(currentLat, currentLng, unvisited[i].lat, unvisited[i].lng);
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        nearestIndex = i;
+                    }
+                }
+
+                const nearest = unvisited[nearestIndex];
+                route.push({
+                    location: nearest,
+                    distance: minDistance
+                });
+                totalDistance += minDistance;
+                currentLat = nearest.lat;
+                currentLng = nearest.lng;
+                unvisited.splice(nearestIndex, 1);
+            }
+
+            return { route, totalDistance };
+        }
+
+        function generateGPX(startPoint, route) {
+            const now = new Date().toISOString();
+            let gpx = `<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="최단거리경로찾기" xmlns="http://www.topografix.com/GPX/1/1">
+    <metadata>
+        <name>최단거리 방문 경로</name>
+        <time>${now}</time>
+    </metadata>
+    <trk>
+        <name>방문 경로</name>
+        <trkseg>
+            <trkpt lat="${startPoint.lat}" lon="${startPoint.lng}">
+                <name>출발지</name>
+                <time>${now}</time>
+            </trkpt>
+`;
+
+            route.forEach((item, index) => {
+                gpx += `            <trkpt lat="${item.location.lat}" lon="${item.location.lng}">
+                <name>${index + 1}. ${item.location.name}</name>
+                <desc>${item.location.address}</desc>
+            </trkpt>
+`;
+            });
+
+            gpx += `        </trkseg>
+    </trk>
+`;
+
+            gpx += `    <wpt lat="${startPoint.lat}" lon="${startPoint.lng}">
+        <name>출발지</name>
+        <sym>Flag, Blue</sym>
+    </wpt>
+`;
+
+            route.forEach((item, index) => {
+                gpx += `    <wpt lat="${item.location.lat}" lon="${item.location.lng}">
+        <name>${index + 1}. ${item.location.name}</name>
+        <desc>${item.location.address} (${item.location.points}점)</desc>
+        <sym>Pin, Red</sym>
+    </wpt>
+`;
+            });
+
+            gpx += `</gpx>`;
+            return gpx;
+        }
+
+        function generateKML(startPoint, route) {
+            let kml = `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+    <Document>
+        <name>최단거리 방문 경로</name>
+        <description>16개 방문지 최적 경로</description>
+        
+        <Style id="startStyle">
+            <IconStyle>
+                <color>ff0000ff</color>
+                <scale>1.2</scale>
+                <Icon>
+                    <href>http://maps.google.com/mapfiles/kml/paddle/blu-circle.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        
+        <Style id="waypointStyle">
+            <IconStyle>
+                <color>ff0000ff</color>
+                <scale>1.0</scale>
+                <Icon>
+                    <href>http://maps.google.com/mapfiles/kml/paddle/red-circle.png</href>
+                </Icon>
+            </IconStyle>
+        </Style>
+        
+        <Style id="routeStyle">
+            <LineStyle>
+                <color>ff0000ff</color>
+                <width>4</width>
+            </LineStyle>
+        </Style>
+        
+        <Placemark>
+            <name>출발지</name>
+            <styleUrl>#startStyle</styleUrl>
+            <Point>
+                <coordinates>${startPoint.lng},${startPoint.lat},0</coordinates>
+            </Point>
+        </Placemark>
+`;
+
+            route.forEach((item, index) => {
+                kml += `        <Placemark>
+            <name>${index + 1}. ${item.location.name}</name>
+            <description>
+                <![CDATA[
+                    <b>주소:</b> ${item.location.address}<br/>
+                    <b>포인트:</b> ${item.location.points}점<br/>
+                    <b>거리:</b> ${item.distance.toFixed(1)} km
+                ]]>
+            </description>
+            <styleUrl>#waypointStyle</styleUrl>
+            <Point>
+                <coordinates>${item.location.lng},${item.location.lat},0</coordinates>
+            </Point>
+        </Placemark>
+`;
+            });
+
+            kml += `        <Placemark>
+            <name>이동 경로</name>
+            <styleUrl>#routeStyle</styleUrl>
+            <LineString>
+                <tessellate>1</tessellate>
+                <coordinates>
+                    ${startPoint.lng},${startPoint.lat},0
+`;
+
+            route.forEach(item => {
+                kml += `                    ${item.location.lng},${item.location.lat},0
+`;
+            });
+
+            kml += `                </coordinates>
+            </LineString>
+        </Placemark>
+    </Document>
+</kml>`;
+            return kml;
+        }
+
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadGPX() {
+            if (!currentRoute || !startPoint) {
+                alert('먼저 경로를 계산해주세요.');
+                return;
+            }
+
+            const gpxContent = generateGPX(startPoint, currentRoute);
+            const filename = `경로_${new Date().toISOString().split('T')[0]}.gpx`;
+            downloadFile(gpxContent, filename, 'application/gpx+xml');
+            
+            showSuccessMessage('✅ GPX 파일이 다운로드되었습니다!');
+        }
+
+        function downloadKML() {
+            if (!currentRoute || !startPoint) {
+                alert('먼저 경로를 계산해주세요.');
+                return;
+            }
+
+            const kmlContent = generateKML(startPoint, currentRoute);
+            const filename = `경로_${new Date().toISOString().split('T')[0]}.kml`;
+            downloadFile(kmlContent, filename, 'application/vnd.google-earth.kml+xml');
+            
+            showSuccessMessage('✅ KML 파일이 다운로드되었습니다!');
+        }
+
+        function showSuccessMessage(message) {
+            const successMsg = document.getElementById('successMsg');
+            successMsg.textContent = message;
+            successMsg.classList.add('show');
+            
+            setTimeout(() => {
+                successMsg.classList.remove('show');
+            }, 3000);
+        }
+
+        async function calculateRoute() {
+            const addressInput = document.getElementById('startAddress').value.trim();
+            const coordsInput = document.getElementById('startCoords').value.trim();
+            const errorMsg = document.getElementById('errorMsg');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+
+            errorMsg.classList.remove('show');
+            results.classList.remove('show');
+
+            let startLat, startLng;
+
+            if (coordsInput) {
+                const coords = coordsInput.split(',').map(s => parseFloat(s.trim()));
+                if (coords.length !== 2 || isNaN(coords[0]) || isNaN(coords[1])) {
+                    errorMsg.textContent = '❌ 좌표 형식이 올바르지 않습니다. (예: 37.5665, 126.9780)';
+                    errorMsg.classList.add('show');
+                    return;
+                }
+                startLat = coords[0];
+                startLng = coords[1];
+            } else if (addressInput) {
+                loading.classList.add('show');
+                try {
+                    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressInput)}&countrycodes=kr&limit=1`);
+                    const data = await response.json();
+                    
+                    if (data.length === 0) {
+                        throw new Error('주소를 찾을 수 없습니다.');
+                    }
+                    
+                    startLat = parseFloat(data[0].lat);
+                    startLng = parseFloat(data[0].lon);
+                } catch (error) {
+                    loading.classList.remove('show');
+                    errorMsg.textContent = `❌ 주소 검색 실패: ${error.message}. 좌표를 직접 입력해주세요.`;
+                    errorMsg.classList.add('show');
+                    return;
+                }
+                loading.classList.remove('show');
+            } else {
+                errorMsg.textContent = '❌ 출발지 주소 또는 좌표를 입력해주세요.';
+                errorMsg.classList.add('show');
+                return;
+            }
+
+            loading.classList.add('show');
+            
+            setTimeout(() => {
+                const { route, totalDistance } = nearestNeighbor(startLat, startLng, locations);
+                
+                currentRoute = route;
+                startPoint = { lat: startLat, lng: startLng };
+                
+                document.getElementById('totalDistance').textContent = totalDistance.toFixed(1) + ' km';
+                const totalPoints = locations.reduce((sum, loc) => sum + loc.points, 0);
+                document.getElementById('totalPoints').textContent = totalPoints + '점';
+                
+                const routeList = document.getElementById('routeList');
+                routeList.innerHTML = '';
+                
+                route.forEach((item, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'route-item';
+                    div.innerHTML = `
+                        <span class="route-number">${index + 1}</span>
+                        <div class="route-info">
+                            <div class="route-name">${item.location.name}</div>
+                            <div class="route-address">${item.location.address}</div>
+                        </div>
+                        <span class="route-distance">${item.distance.toFixed(1)} km</span>
+                    `;
+                    routeList.appendChild(div);
+                });
+                
+                loading.classList.remove('show');
+                results.classList.add('show');
+                
+                // 자동으로 지도에 표시
+                showRouteOnMap();
+                
+                results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 500);
+        }
+
+        function resetForm() {
+            document.getElementById('startAddress').value = '';
+            document.getElementById('startCoords').value = '';
+            document.getElementById('gpxFile').value = '';
+            document.getElementById('fileLabel').textContent = '📁 GPX 파일을 선택하거나 드래그 앤 드롭하세요';
+            document.getElementById('fileLabel').classList.remove('has-file');
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('errorMsg').classList.remove('show');
+            document.getElementById('successMsg').classList.remove('show');
+            currentRoute = null;
+            startPoint = null;
+            
+            if (map) {
+                routeLayer.clearLayers();
+                markersLayer.clearLayers();
+            }
+        }
+
+        document.getElementById('startAddress').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') calculateRoute();
+        });
+
+        document.getElementById('startCoords').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') calculateRoute();
+        });
+    </script>
+</body>
+</html>
