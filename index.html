@@ -16,7 +16,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 0px;
         }
 
         .container {
@@ -312,6 +312,31 @@
             animation: spin 1s linear infinite;
             margin: 0 auto 20px;
         }
+		@media (max-width: 768px) {
+
+  body {
+    padding: 0;
+  }
+
+  .container {
+    margin: 0;
+    border-radius: 0;   /* ✅ 좌우 꽉 채우기 */
+    max-width: 100%;
+  }
+
+  .content {
+    padding: 15px;   /* ✅ 30px → 줄이기 */
+  }
+
+  .header {
+    padding: 20px;
+  }
+
+  #map {
+    height: 400px;  /* ✅ 모바일에서 지도 줄이기 */
+  }
+
+}
 
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -1051,3 +1076,7 @@
     </script>
 </body>
 </html>
+
+
+
+
