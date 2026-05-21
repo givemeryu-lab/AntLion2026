@@ -16,58 +16,169 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 2px;
+            padding: 0;
         }
 
         .container {
-            max-width: 1400px;
-            margin: 0 auto;
+            max-width: 100%;
+            margin: 0;
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border-radius: 0;
+            box-shadow: none;
             overflow: hidden;
         }
 
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 3px;
+            padding: 15px;
             text-align: center;
         }
 
-        .header h1 {
-            font-size: 28px;
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
             margin-bottom: 10px;
         }
 
+        .logo {
+            width: 500px;
+            height: 200px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid white;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 12px;
+        }
+
         .content {
-            padding: 3px;
+            padding: 0;
+        }
+
+        .map-section {
+            background: white;
+            padding: 0;
+            margin-bottom: 0;
+        }
+
+        .map-section h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+            padding: 10px 15px 0 15px;
+        }
+
+        #map {
+            width: 100%;
+            height: 400px;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .map-controls {
+            display: flex;
+            gap: 5px;
+            margin: 10px 15px;
+            flex-wrap: wrap;
+        }
+
+        .toggle-section {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            margin: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .toggle-section label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            margin: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 26px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: #667eea;
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(24px);
         }
 
         .input-section {
             background: #f8f9fa;
-            padding: 2px;
-            border-radius: 15px;
-            margin-bottom: 30px;
+            padding: 15px;
+            border-radius: 0;
+            margin-bottom: 0;
+            border-bottom: 1px solid #e0e0e0;
         }
 
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         label {
             display: block;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             color: #333;
+            font-size: 14px;
         }
 
         input, select {
             width: 100%;
-            padding: 12px 15px;
+            padding: 10px 12px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 14px;
             transition: border-color 0.3s;
         }
 
@@ -83,25 +194,27 @@
 
         .route-mode-section {
             background: #fff3cd;
-            padding: 2px;
-            border-radius: 15px;
-            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 0;
+            margin-bottom: 0;
+            border-bottom: 1px solid #e0e0e0;
         }
 
         .route-mode-section h3 {
             color: #333;
-            margin-bottom: 15px;
-            font-size: 18px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            padding: 0;
         }
 
         .mode-buttons {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
         }
 
         .mode-btn {
-            padding: 1px;
+            padding: 12px 8px;
             border: 2px solid #ffc107;
             background: white;
             border-radius: 8px;
@@ -123,27 +236,27 @@
         }
 
         .mode-btn .mode-title {
-            font-size: 16px;
-            margin-bottom: 5px;
+            font-size: 14px;
+            margin-bottom: 3px;
         }
 
         .mode-btn .mode-desc {
-            font-size: 12px;
+            font-size: 11px;
             opacity: 0.8;
         }
 
         .button-group {
             display: flex;
-            gap: 10px;
-            margin-top: 20px;
+            gap: 8px;
+            margin-top: 15px;
         }
 
         button {
             flex: 1;
-            padding: 1px;
+            padding: 12px;
             border: none;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
@@ -176,31 +289,31 @@
         .btn-success {
             background: #28a745;
             color: white;
+            font-size: 13px;
         }
 
         .btn-success:hover {
             background: #218838;
-            transform: translateY(-2px);
         }
 
         .btn-info {
             background: #17a2b8;
             color: white;
+            font-size: 13px;
         }
 
         .btn-info:hover {
             background: #138496;
-            transform: translateY(-2px);
         }
 
         .btn-warning {
             background: #ffc107;
             color: #333;
+            font-size: 13px;
         }
 
         .btn-warning:hover {
             background: #e0a800;
-            transform: translateY(-2px);
         }
 
         .results {
@@ -214,104 +327,75 @@
         .summary {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             color: white;
-            padding: 2px;
-            border-radius: 15px;
-            margin-bottom: 25px;
+            padding: 15px;
+            border-radius: 0;
+            margin-bottom: 0;
+            border-bottom: 3px solid rgba(0,0,0,0.1);
         }
 
         .summary h2 {
-            font-size: 24px;
-            margin-bottom: 15px;
+            font-size: 18px;
+            margin-bottom: 10px;
         }
 
         .summary-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 10px;
         }
 
         .stat-box {
             background: rgba(255,255,255,0.2);
-            padding: 15px;
+            padding: 10px;
             border-radius: 10px;
             backdrop-filter: blur(10px);
         }
 
         .stat-label {
-            font-size: 14px;
+            font-size: 11px;
             opacity: 0.9;
         }
 
         .stat-value {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 700;
-            margin-top: 5px;
-        }
-
-        .map-section {
-            background: #f8f9fa;
-            padding: 0px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-        }
-
-        .map-section h3 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 20px;
-        }
-
-        #map {
-            width: 100%;
-            height: 600px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .map-controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+            margin-top: 3px;
         }
 
         .export-section {
             background: #e7f3ff;
-            padding: 2px;
-            border-radius: 15px;
-            margin-bottom: 25px;
+            padding: 15px;
+            border-radius: 0;
+            margin-bottom: 0;
+            border-bottom: 1px solid #e0e0e0;
         }
 
         .export-section h3 {
             color: #333;
-            margin-bottom: 15px;
-            font-size: 20px;
+            margin-bottom: 10px;
+            font-size: 16px;
         }
 
         .export-buttons {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
         }
 
         .route-list {
             background: #f8f9fa;
-            padding: 2px;
-            border-radius: 15px;
+            padding: 15px;
+            border-radius: 0;
         }
 
         .route-item {
             background: white;
-            padding: 2px;
-            border-radius: 10px;
-            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
             border-left: 4px solid #667eea;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-        }
-
-        .route-item:hover {
-            transform: translateX(5px);
         }
 
         .route-item.return {
@@ -322,13 +406,14 @@
             display: inline-block;
             background: #667eea;
             color: white;
-            width: 35px;
-            height: 35px;
-            line-height: 35px;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
             text-align: center;
             border-radius: 50%;
             font-weight: 700;
-            margin-right: 15px;
+            margin-right: 10px;
+            font-size: 13px;
         }
 
         .route-number.return {
@@ -338,17 +423,18 @@
         .route-info {
             display: inline-block;
             vertical-align: middle;
+            width: calc(100% - 120px);
         }
 
         .route-name {
-            font-size: 18px;
+            font-size: 14px;
             font-weight: 600;
             color: #333;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
 
         .route-address {
-            font-size: 14px;
+            font-size: 11px;
             color: #666;
         }
 
@@ -356,15 +442,15 @@
             float: right;
             background: #e7f3ff;
             color: #0066cc;
-            padding: 8px 15px;
-            border-radius: 20px;
+            padding: 5px 8px;
+            border-radius: 15px;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 11px;
         }
 
         .loading {
             text-align: center;
-            padding: 40px;
+            padding: 30px 15px;
             display: none;
         }
 
@@ -379,7 +465,7 @@
             width: 50px;
             height: 50px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            margin: 0 auto 15px;
         }
 
         @keyframes spin {
@@ -389,11 +475,11 @@
 
         .progress-bar {
             width: 100%;
-            height: 30px;
+            height: 25px;
             background: #e0e0e0;
             border-radius: 15px;
             overflow: hidden;
-            margin-top: 15px;
+            margin-top: 10px;
         }
 
         .progress-fill {
@@ -405,17 +491,18 @@
             justify-content: center;
             color: white;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 12px;
         }
 
         .error {
             background: #fff3cd;
             border: 1px solid #ffc107;
             color: #856404;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            padding: 12px 15px;
+            border-radius: 0;
+            margin-bottom: 0;
             display: none;
+            font-size: 13px;
         }
 
         .error.show {
@@ -426,10 +513,11 @@
             background: #d4edda;
             border: 1px solid #c3e6cb;
             color: #155724;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            padding: 12px 15px;
+            border-radius: 0;
+            margin-bottom: 0;
             display: none;
+            font-size: 13px;
         }
 
         .success-message.show {
@@ -438,15 +526,16 @@
 
         .file-upload-section {
             background: #e7f3ff;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 25px;
+            padding: 15px;
+            border-radius: 0;
+            margin-bottom: 0;
+            border-bottom: 1px solid #e0e0e0;
         }
 
         .file-upload-section h3 {
             color: #333;
-            margin-bottom: 15px;
-            font-size: 20px;
+            margin-bottom: 10px;
+            font-size: 16px;
         }
 
         .file-input-wrapper {
@@ -462,13 +551,14 @@
 
         .file-input-label {
             display: block;
-            padding: 15px;
+            padding: 12px;
             background: white;
             border: 2px dashed #17a2b8;
             border-radius: 8px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
+            font-size: 13px;
         }
 
         .file-input-label:hover {
@@ -486,11 +576,34 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🗺️ 최단거리 경로 찾기 (원점 복귀)</h1>
-            <p>출발지를 입력하고 목표 포인트를 선택하면 최적 경로를 안내합니다</p>
+            <div class="header-content">
+                <img src="https://github.com/givemeryu-lab/AntLion2026/blob/main/2026-05-20_002.jpg?raw=true" alt="Logo" class="logo">
+                <div>
+                    <h1></h1>
+                </div>
+            </div>
+            <p>최단거리 경로 찾기</p>
         </div>
 
         <div class="content">
+            <!-- 지도를 가장 위로 이동 -->
+            <div class="map-section">
+                <div class="map-controls">
+                    <button class="btn-warning" onclick="fitMapBounds()">🔍 전체보기</button>
+                    <button class="btn-info" onclick="showRouteOnMap()">🔄 새로고침</button>
+                </div>
+                <div id="map"></div>
+            </div>
+
+            <!-- 토글 버튼 추가 -->
+            <div class="toggle-section">
+                <label>📍 지도 포인트 표시</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="markerToggle" checked onchange="toggleMarkers()">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
             <div class="input-section">
                 <div class="input-group">
                     <label>📍 출발지 주소</label>
@@ -531,7 +644,15 @@
                 </div>
             </div>
 
-           
+            <div class="file-upload-section">
+                <h3>📂 GPX 파일 불러오기</h3>
+                <div class="file-input-wrapper">
+                    <input type="file" id="gpxFile" accept=".gpx" onchange="handleGPXUpload(event)">
+                    <label for="gpxFile" class="file-input-label" id="fileLabel">
+                        📁 GPX 파일 선택
+                    </label>
+                </div>
+            </div>
 
             <div class="error" id="errorMsg"></div>
             <div class="success-message" id="successMsg"></div>
@@ -567,29 +688,20 @@
                     </div>
                 </div>
 
-                <div class="map-section">
-                    <h3>🗺️ 경로 지도</h3>
-                    <div class="map-controls">
-                        <button class="btn-warning" onclick="showRouteOnMap()">📍 지도에 경로 표시</button>
-                        <button class="btn-info" onclick="fitMapBounds()">🔍 전체 경로 보기</button>
-                    </div>
-                    <div id="map"></div>
-                </div>
-
                 <div class="export-section">
                     <h3>📥 경로 파일 다운로드</h3>
                     <div class="export-buttons">
                         <button class="btn-success" onclick="downloadGPX()">
-                            📍 GPX 파일 다운로드
+                            📍 GPX 다운로드
                         </button>
                         <button class="btn-info" onclick="downloadKML()">
-                            🗺️ KML 파일 다운로드
+                            🗺️ KML 다운로드
                         </button>
                     </div>
                 </div>
 
                 <div class="route-list">
-                    <h3 style="margin-bottom: 20px; color: #333;">🛣️ 방문 순서 (왕복 경로)</h3>
+                    <h3 style="margin-bottom: 15px; color: #333; font-size: 16px;">🛣️ 방문 순서</h3>
                     <div id="routeList"></div>
                 </div>
             </div>
@@ -623,7 +735,60 @@
         let routeLayer = null;
         let markersLayer = null;
         let fullRouteGeometry = [];
-        let selectedMode = '15'; // 기본값
+        let selectedMode = '15';
+
+        function initMap() {
+            if (!map) {
+                map = L.map('map').setView([36.5, 127.5], 7);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors',
+                    maxZoom: 18
+                }).addTo(map);
+                
+                routeLayer = L.layerGroup().addTo(map);
+                markersLayer = L.layerGroup().addTo(map);
+
+                // 페이지 로드시 기본 16개 지점 표시
+                showDefaultLocations();
+            }
+        }
+
+        function showDefaultLocations() {
+            markersLayer.clearLayers();
+
+            allLocations.forEach((loc, index) => {
+                // 포인트에 따라 색상 구분
+                const bgColor = loc.points === 1 ? '#ff6b6b' : '#4ecdc4';
+                
+                const markerIcon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `<div style="background-color: ${bgColor}; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3); font-size: 12px;">${index + 1}</div>`,
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
+                });
+
+                L.marker([loc.lat, loc.lng], { icon: markerIcon })
+                    .bindPopup(`
+                        <b>${loc.name}</b><br>
+                        ${loc.address}<br>
+                        <small>포인트: ${loc.points}점</small>
+                    `)
+                    .addTo(markersLayer);
+            });
+
+            // 전체 마커가 보이도록 지도 범위 조정
+            const bounds = L.latLngBounds(allLocations.map(loc => [loc.lat, loc.lng]));
+            map.fitBounds(bounds, { padding: [30, 30] });
+        }
+
+        function toggleMarkers() {
+            const isChecked = document.getElementById('markerToggle').checked;
+            if (isChecked) {
+                map.addLayer(markersLayer);
+            } else {
+                map.removeLayer(markersLayer);
+            }
+        }
 
         function selectMode(mode) {
             selectedMode = mode;
@@ -640,35 +805,28 @@
 
             const target = parseInt(targetPoints);
             
-            // 각 장소까지의 거리 계산
             const locationsWithDistance = allLocations.map(loc => ({
                 ...loc,
                 straightDistance: getDistance(startLat, startLng, loc.lat, loc.lng)
             }));
 
-            // 효율성 점수 계산 (포인트/거리)
             locationsWithDistance.forEach(loc => {
-                loc.efficiency = loc.points / (loc.straightDistance + 1); // +1은 0으로 나누기 방지
+                loc.efficiency = loc.points / (loc.straightDistance + 1);
             });
 
-            // 그리디 알고리즘으로 최적 조합 찾기
             const selected = [];
             let currentPoints = 0;
             const remaining = [...locationsWithDistance];
 
-            // 효율성 순으로 정렬
             remaining.sort((a, b) => b.efficiency - a.efficiency);
 
-            // 목표 포인트를 달성하거나 초과하는 최소 조합
             for (const loc of remaining) {
                 if (currentPoints >= target) break;
                 selected.push(loc);
                 currentPoints += loc.points;
             }
 
-            // 목표를 달성했다면 정확히 목표에 맞추기
             if (currentPoints >= target) {
-                // 초과한 경우 최적화
                 selected.sort((a, b) => a.points - b.points);
                 
                 while (currentPoints > target) {
@@ -686,19 +844,6 @@
             }
 
             return selected;
-        }
-
-        function initMap() {
-            if (!map) {
-                map = L.map('map').setView([36.5, 127.5], 7);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap contributors',
-                    maxZoom: 18
-                }).addTo(map);
-                
-                routeLayer = L.layerGroup().addTo(map);
-                markersLayer = L.layerGroup().addTo(map);
-            }
         }
 
         async function getRoadRoute(fromLat, fromLng, toLat, toLng) {
@@ -827,7 +972,8 @@
 
         function showRouteOnMap() {
             if (!currentRoute || !startPoint) {
-                alert('먼저 경로를 계산해주세요.');
+                // 경로가 없으면 기본 지점만 표시
+                showDefaultLocations();
                 return;
             }
 
@@ -847,9 +993,9 @@
 
             const startIcon = L.divIcon({
                 className: 'custom-div-icon',
-                html: `<div style="background-color: #0066ff; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">출발</div>`,
-                iconSize: [40, 40],
-                iconAnchor: [20, 20]
+                html: `<div style="background-color: #0066ff; color: white; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3); font-size: 11px;">출발</div>`,
+                iconSize: [35, 35],
+                iconAnchor: [17.5, 17.5]
             });
 
             L.marker([startPoint.lat, startPoint.lng], { icon: startIcon })
@@ -859,11 +1005,14 @@
             currentRoute.forEach((item, index) => {
                 if (item.isReturn) return;
 
+                // 포인트에 따라 색상 구분
+                const bgColor = item.location.points === 1 ? '#ff6b6b' : '#4ecdc4';
+
                 const markerIcon = L.divIcon({
                     className: 'custom-div-icon',
-                    html: `<div style="background-color: #ff4757; color: white; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">${index + 1}</div>`,
-                    iconSize: [35, 35],
-                    iconAnchor: [17.5, 17.5]
+                    html: `<div style="background-color: ${bgColor}; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3); font-size: 12px;">${index + 1}</div>`,
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
                 });
 
                 L.marker([item.location.lat, item.location.lng], { icon: markerIcon })
@@ -880,10 +1029,43 @@
         }
 
         function fitMapBounds() {
+            if (!map) return;
+
+            let bounds;
+            
+            // routeLayer에 레이어가 있으면 그 범위 사용
             if (routeLayer && routeLayer.getLayers().length > 0) {
-                const bounds = routeLayer.getBounds();
-                map.fitBounds(bounds, { padding: [50, 50] });
+                const allLatLngs = [];
+                routeLayer.eachLayer(layer => {
+                    if (layer instanceof L.Polyline) {
+                        allLatLngs.push(...layer.getLatLngs());
+                    }
+                });
+                if (allLatLngs.length > 0) {
+                    bounds = L.latLngBounds(allLatLngs);
+                    map.fitBounds(bounds, { padding: [30, 30] });
+                    return;
+                }
             }
+            
+            // markersLayer에 마커가 있으면 그 범위 사용
+            if (markersLayer && markersLayer.getLayers().length > 0) {
+                const allLatLngs = [];
+                markersLayer.eachLayer(layer => {
+                    if (layer instanceof L.Marker) {
+                        allLatLngs.push(layer.getLatLng());
+                    }
+                });
+                if (allLatLngs.length > 0) {
+                    bounds = L.latLngBounds(allLatLngs);
+                    map.fitBounds(bounds, { padding: [30, 30] });
+                    return;
+                }
+            }
+            
+            // 둘 다 없으면 기본 16개 지점 범위 사용
+            bounds = L.latLngBounds(allLocations.map(loc => [loc.lat, loc.lng]));
+            map.fitBounds(bounds, { padding: [30, 30] });
         }
 
         function handleGPXUpload(event) {
@@ -933,7 +1115,7 @@
                         opacity: 0.7
                     }).addTo(routeLayer);
                     
-                    map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
+                    map.fitBounds(polyline.getBounds(), { padding: [30, 30] });
                 }
 
                 for (let i = 0; i < wpts.length; i++) {
@@ -949,16 +1131,16 @@
                     if (name.includes('출발지')) {
                         markerIcon = L.divIcon({
                             className: 'custom-div-icon',
-                            html: `<div style="background-color: #0066ff; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">출발</div>`,
-                            iconSize: [40, 40],
-                            iconAnchor: [20, 20]
+                            html: `<div style="background-color: #0066ff; color: white; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3); font-size: 11px;">출발</div>`,
+                            iconSize: [35, 35],
+                            iconAnchor: [17.5, 17.5]
                         });
                     } else {
                         markerIcon = L.divIcon({
                             className: 'custom-div-icon',
-                            html: `<div style="background-color: #28a745; color: white; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">${i}</div>`,
-                            iconSize: [35, 35],
-                            iconAnchor: [17.5, 17.5]
+                            html: `<div style="background-color: #28a745; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3); font-size: 12px;">${i}</div>`,
+                            iconSize: [30, 30],
+                            iconAnchor: [15, 15]
                         });
                     }
 
@@ -970,7 +1152,7 @@
                 document.getElementById('results').classList.add('show');
                 showSuccessMessage('✅ GPX 파일이 지도에 표시되었습니다!');
                 
-                document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
             } catch (error) {
                 const errorMsg = document.getElementById('errorMsg');
@@ -1247,7 +1429,6 @@
             updateProgress(10, '최적 장소를 선택중입니다...');
             
             try {
-                // 선택된 모드에 따라 최적 장소 선택
                 const selectedLocations = getOptimalLocations(startLat, startLng, selectedMode);
                 
                 updateProgress(15, `${selectedLocations.length}개 장소 선택 완료. 경로 계산 시작...`);
@@ -1304,11 +1485,12 @@
                 
                 showRouteOnMap();
                 
-                results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // 지도로 스크롤
+                document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'start' });
             } catch (error) {
                 loading.classList.remove('show');
                 calculateBtn.disabled = false;
-                //errorMsg.textContent = `❌ 경로 계산 실패: ${error.message}`;
+                errorMsg.textContent = `❌ 경로 계산 실패: ${error.message}`;
                 errorMsg.classList.add('show');
             }
         }
@@ -1317,7 +1499,7 @@
             document.getElementById('startAddress').value = '';
             document.getElementById('startCoords').value = '';
             document.getElementById('gpxFile').value = '';
-            document.getElementById('fileLabel').textContent = '📁 GPX 파일을 선택하거나 드래그 앤 드롭하세요';
+            document.getElementById('fileLabel').textContent = '📁 GPX 파일 선택';
             document.getElementById('fileLabel').classList.remove('has-file');
             document.getElementById('results').classList.remove('show');
             document.getElementById('errorMsg').classList.remove('show');
@@ -1327,10 +1509,8 @@
             startPoint = null;
             fullRouteGeometry = [];
             
-            if (map) {
-                routeLayer.clearLayers();
-                markersLayer.clearLayers();
-            }
+            // 기본 지점 표시
+            showDefaultLocations();
         }
 
         document.getElementById('startAddress').addEventListener('keypress', function(e) {
@@ -1339,6 +1519,11 @@
 
         document.getElementById('startCoords').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') calculateRoute();
+        });
+
+        // 페이지 로드시 지도 초기화
+        window.addEventListener('load', function() {
+            initMap();
         });
     </script>
 </body>
